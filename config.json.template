@@ -1,0 +1,18 @@
+{
+  "url": "https://example.com",
+  "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:65.0) Gecko/20100101 Firefox/65.0",
+  "use_ajax": 0,
+  "write_response_body_to_file": 1,
+  "cookie": {
+    "domain": "example.com",
+    "values": [
+      ["session", "xxxxxxxxxxxxxxxxxxxxxxxxxx", 1, 1, "/"],
+      ["username", "john.doe", 1, 0, "/"]
+    ]
+  },
+  "post_fields": [
+    "foo=1",
+    "bar=2",
+    "baz=3"
+  ]
+}

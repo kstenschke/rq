@@ -18,6 +18,18 @@ rq options
 None yet. Use config.json.template to configure parameters.
 
 
+## Building from source
+
+```bash
+cmake CMakeLists.txt; make
+```
+
+
+## Code Convention
+
+The source code of rq follows the Google C++ Style Guide, see: https://google.github.io/styleguide/cppguide.html
+
+
 ## Author and License
 
 Written by Kay Stenschke.

@@ -27,3 +27,40 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <json-c/json_object.h>
+#include <string>
+#include <json-c/json.h>
+
+#include "helper_string.h"
+#include "helper_file.h"
+
+void read_config(std::string &path_config,
+                 const char *&url,
+                 const char *&user_agent,
+                 bool &use_ajax,
+                 bool &write_response_body_to_file,
+                 const char *&post_fields,
+                 json_object *&config_obj) {
+  std::__1::string config_json = file_get_contents(path_config);
+  config_obj = json_tokener_parse(config_json.c_str());
+
+  struct json_object *url_obj;
+  json_object_object_get_ex(config_obj, "url", &url_obj);
+  url = json_object_get_string(url_obj);
+
+  struct json_object *user_agent_obj;
+  json_object_object_get_ex(config_obj, "user_agent", &user_agent_obj);
+  user_agent = json_object_get_string(user_agent_obj);
+
+  struct json_object *use_ajax_obj;
+  json_object_object_get_ex(config_obj, "user_ajax", &use_ajax_obj);
+  use_ajax = json_object_get_int(use_ajax_obj)==1;
+
+  struct json_object *write_response_body_to_file_obj;
+  json_object_object_get_ex(config_obj, "write_response_body_to_file", &write_response_body_to_file_obj);
+  write_response_body_to_file = json_object_get_int(write_response_body_to_file_obj)==1;
+
+  struct json_object *post_fields_obj;
+  json_object_object_get_ex(config_obj, "post_fields", &post_fields_obj);
+  post_fields = str_replace_all(json_object_get_string(post_fields_obj), "\", \"", "&").c_str();
+}

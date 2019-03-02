@@ -30,6 +30,15 @@
 #ifndef RQ_CONFIG_READER_H
 #define RQ_CONFIG_READER_H
 
+#include <json-c/json_object.h>
+#include <string>
 
+void read_config(std::string &path_config,
+                 const char *&url,
+                 const char *&user_agent,
+                 bool &use_ajax,
+                 bool &write_response_body_to_file,
+                 const char *&post_fields,
+                 json_object *&config_obj);
 
 #endif //RQ_CONFIG_READER_H

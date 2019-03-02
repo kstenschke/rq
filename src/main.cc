@@ -33,6 +33,7 @@
 #include <curl/curl.h>
 
 #include "helper_file.h"
+#include "config_reader.h"
 #include "helper_string.h"
 #include "curl_wrapper.h"
 
@@ -50,30 +51,14 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  std::string config_json = file_get_contents(path_config);
+  const char *url;
+  const char *user_agent;
+  bool use_ajax;
+  bool write_response_body_to_file;
+  const char *post_fields;
+  json_object *config_obj;
 
-  struct json_object *config_obj;
-  config_obj = json_tokener_parse(config_json.c_str());
-
-  struct json_object *url_obj;
-  json_object_object_get_ex(config_obj, "url", &url_obj);
-  const char *url = json_object_get_string(url_obj);
-
-  struct json_object *user_agent_obj;
-  json_object_object_get_ex(config_obj, "user_agent", &user_agent_obj);
-  const char *user_agent = json_object_get_string(user_agent_obj);
-
-  struct json_object *use_ajax_obj;
-  json_object_object_get_ex(config_obj, "user_ajax", &use_ajax_obj);
-  bool use_ajax = json_object_get_int(use_ajax_obj) == 1;
-
-  struct json_object *write_response_body_to_file_obj;
-  json_object_object_get_ex(config_obj, "write_response_body_to_file", &write_response_body_to_file_obj);
-  bool write_response_body_to_file = json_object_get_int(write_response_body_to_file_obj) == 1;
-
-  struct json_object *post_fields_obj;
-  json_object_object_get_ex(config_obj, "post_fields", &post_fields_obj);
-  const char *post_fields = str_replace_all(json_object_get_string(post_fields_obj), "\", \"", "&").c_str();
+  read_config(path_config, url, user_agent, use_ajax, write_response_body_to_file, post_fields, config_obj);
 
   CURL *curl;
   CURLcode res;

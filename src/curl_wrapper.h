@@ -32,14 +32,14 @@
 
 #include <curl/curl.h>
 
-void print_cookies(CURL *curl);
+void PrintCookies(CURL *curl);
 
-void set_cookie(CURL *curl_handle,
-                const char *cookie_url,
-                const char *cookie_path,
-                bool host_only,
-                bool http_only,
-                const char *cookie_key,
-                const char *cookie_value);
+void SetCookie(CURL *curl_handle,
+               const char *cookie_url,
+               const char *cookie_path,
+               bool host_only,
+               bool http_only,
+               const char *cookie_key,
+               const char *cookie_value);
 
 #endif //RQ_CURL_WRAPPER_H

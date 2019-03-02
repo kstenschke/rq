@@ -36,7 +36,7 @@
 #define snprintf _snprintf
 #endif
 
-void print_cookies(CURL *curl)
+void PrintCookies(CURL *curl)
 {
   CURLcode res;
   struct curl_slist *cookies;
@@ -63,13 +63,13 @@ void print_cookies(CURL *curl)
   curl_slist_free_all(cookies);
 }
 
-void set_cookie(CURL *curl_handle,
-                const char *cookie_url,
-                const char *cookie_path,
-                bool host_only,
-                bool http_only,
-                const char *cookie_key,
-                const char *cookie_value) {
+void SetCookie(CURL *curl_handle,
+               const char *cookie_url,
+               const char *cookie_path,
+               bool host_only,
+               bool http_only,
+               const char *cookie_key,
+               const char *cookie_value) {
   // Netscape format cookie
   char nline[256];
   snprintf(

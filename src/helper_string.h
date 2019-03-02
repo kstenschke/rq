@@ -30,12 +30,9 @@
 #ifndef RQ_HELPER_STRING_H
 #define RQ_HELPER_STRING_H
 
-std::string str_replace_all(std::string &haystack, const char *needle, const char *replacement);
-std::string str_replace_all(const char *haystack, const char *needle, const char *replacement);
-bool str_contains(std::string &haystack, std::string &needle);
-bool str_contains(std::string &haystack, const char *needle);
-bool str_contains(const char *haystack, std::string &needle);
-bool str_contains(char *haystack, const char *needle);
-std::string url_to_filename(const char *url);
+std::string StrReplaceAll(std::string &haystack, const char *needle, const char *replacement);
+std::string StrReplaceAll(const char *haystack, const char *needle, const char *replacement);
+bool StrContains(char *haystack, const char *needle);
+std::string UrlToFilename(const char *url);
 
 #endif //RQ_HELPER_STRING_H

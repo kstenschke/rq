@@ -37,7 +37,7 @@
 /**
  * Get absolute path to application executable
  */
-std::string get_binary_path(char **argv, size_t strLenExecutableName) {
+std::string GetBinaryPath(char **argv, size_t strLenExecutableName) {
   char *path_relative = argv[0];
   char absolute_path[255];
   char *ptr;
@@ -48,11 +48,11 @@ std::string get_binary_path(char **argv, size_t strLenExecutableName) {
   return std::string(ptr).substr(0, len_without_binary);
 }
 
-bool file_exists(const std::string &name) {
+bool FileExists(const std::string &name) {
   return access(name.c_str(), F_OK) != -1;
 }
 
-std::string file_stream_get_contents(std::ifstream &file) {
+std::string FileStreamGetContents(std::ifstream &file) {
   // Get filesize
   file.seekg(0, std::ios::end);
   std::streampos length = file.tellg();
@@ -67,15 +67,15 @@ std::string file_stream_get_contents(std::ifstream &file) {
   return str;
 }
 
-void add_file_extension_by_content_type(std::string &path_binary,
-                                        std::string &filename_response_body,
-                                        char *content_type) {
+void AddFileExtensionByContentType(std::string &path_binary,
+                                   std::string &filename_response_body,
+                                   char *content_type) {
   if (content_type) {
     std::string filename_old = path_binary.append(filename_response_body);
     std::string filename_new;
-    if (str_contains(content_type, "html")) {
+    if (StrContains(content_type, "html")) {
       filename_new = path_binary.append(filename_response_body.append(".html"));
-    } else if (str_contains(content_type, "xml")) {
+    } else if (StrContains(content_type, "xml")) {
       filename_new = path_binary.append(filename_response_body.append(".xml"));
     } else {
       filename_new = path_binary.append(filename_response_body.append(".json"));
@@ -84,8 +84,8 @@ void add_file_extension_by_content_type(std::string &path_binary,
   }
 }
 
-std::string file_get_contents(std::string &filename) {
+std::string FileGetContents(std::string &filename) {
   std::ifstream file(filename);
 
-  return file_stream_get_contents(file);
+  return FileStreamGetContents(file);
 }

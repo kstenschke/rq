@@ -33,7 +33,7 @@
 
 #include "helper_string.h"
 
-std::string str_replace_all(std::string &haystack, const char *needle, const char *replacement) {
+std::string StrReplaceAll(std::string &haystack, const char *needle, const char *replacement) {
   size_t needle_len = std::strlen(needle);
 
   size_t index = 0;
@@ -47,30 +47,21 @@ std::string str_replace_all(std::string &haystack, const char *needle, const cha
   return haystack;
 }
 
-std::string str_replace_all(const char *haystack, const char *needle, const char *replacement) {
+std::string StrReplaceAll(const char *haystack, const char *needle, const char *replacement) {
   std::string str = std::string(haystack);
-  return str_replace_all(str, needle, replacement);
+  return StrReplaceAll(str, needle, replacement);
 }
 
-bool str_contains(std::string &haystack, std::string &needle) {
-  return std::string::npos != haystack.find(needle);
-}
-bool str_contains(std::string &haystack, const char *needle) {
-  return std::string::npos != haystack.find(needle);
-}
-bool str_contains(const char *haystack, std::string &needle) {
-  return std::string::npos != std::string(haystack, strlen(haystack)).find(needle);
-}
-bool str_contains(char *haystack, const char *needle) {
+bool StrContains(char *haystack, const char *needle) {
   return std::string::npos != std::string(haystack, strlen(haystack)).find(needle);
 }
 
-std::string url_to_filename(const char *url) {
+std::string UrlToFilename(const char *url) {
   std::string filename;
 
-  filename = str_replace_all(url, "https://", "");
-  filename = str_replace_all(filename, "http://", "");
-  filename = str_replace_all(filename, "/", "-");
+  filename = StrReplaceAll(url, "https://", "");
+  filename = StrReplaceAll(filename, "http://", "");
+  filename = StrReplaceAll(filename, "/", "-");
 
   return filename;
 }

@@ -30,13 +30,13 @@
 #ifndef RQ_HELPER_FILE_H
 #define RQ_HELPER_FILE_H
 
-std::string get_binary_path(char **argv, size_t strLenExecutableName);
-bool file_exists(const std::string &name);
-std::string file_stream_get_contents(std::ifstream &file);
-std::string file_get_contents(std::string &filename);
+std::string GetBinaryPath(char **argv, size_t strLenExecutableName);
+bool FileExists(const std::string &name);
+std::string FileStreamGetContents(std::ifstream &file);
+std::string FileGetContents(std::string &filename);
 
-void add_file_extension_by_content_type(std::string &path_binary,
-                                        std::string &filename_response_body,
-                                        char *content_type);
+void AddFileExtensionByContentType(std::string &path_binary,
+                                   std::string &filename_response_body,
+                                   char *content_type);
 
 #endif //RQ_HELPER_FILE_H

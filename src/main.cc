@@ -37,16 +37,17 @@
 #include "helper_string.h"
 #include "curl_wrapper.h"
 
+const char *ReadPostFieldsConfig(const json_object *config_obj);
 /**
  * @param argc Amount of arguments received
  * @param argv Array of arguments received, argv[0] is name and path of executable
  */
 int main(int argc, char **argv) {
-  std::string path_binary = get_binary_path(argv, 2);
+  std::string path_binary = GetBinaryPath(argv, 2);
   std::string path_config = path_binary;
   path_config = path_config.append("config.json");
 
-  if (!file_exists(path_config)) {
+  if (!FileExists(path_config)) {
     fprintf(stderr, "File not found: config.json\n");
     return 1;
   }
@@ -56,9 +57,10 @@ int main(int argc, char **argv) {
   bool use_ajax;
   bool write_response_body_to_file;
   const char *post_fields;
+
   json_object *config_obj;
 
-  read_config(path_config, url, user_agent, use_ajax, write_response_body_to_file, post_fields, config_obj);
+  ReadConfig(path_config, url, user_agent, use_ajax, write_response_body_to_file, config_obj);
 
   CURL *curl;
   CURLcode res;
@@ -77,17 +79,11 @@ int main(int argc, char **argv) {
   // set cookies
   curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "");
 
-  struct json_object *cookie_obj;
-  struct json_object *cookie_domain_obj;
-  struct json_object *cookie_items_obj;
   const char *cookie_domain;
+  struct json_object *cookie_items_obj;
 
-  json_object_object_get_ex(config_obj, "cookie", &cookie_obj);
+  ReadCookiesConfig(config_obj, cookie_domain, cookie_items_obj);
 
-  json_object_object_get_ex(cookie_obj, "domain", &cookie_domain_obj);
-  cookie_domain = json_object_get_string(cookie_domain_obj);
-
-  json_object_object_get_ex(cookie_obj, "values", &cookie_items_obj);
   for (int i=0; i < json_object_array_length(cookie_items_obj); i++) {
     struct json_object *cookie_value_obj = json_object_array_get_idx(cookie_items_obj, i);
 
@@ -97,10 +93,10 @@ int main(int argc, char **argv) {
     bool cookie_http_only = json_object_get_int(json_object_array_get_idx(cookie_value_obj, 3)) == 1;
     const char *cookie_path = json_object_get_string(json_object_array_get_idx(cookie_value_obj, 4));
 
-    set_cookie(curl, cookie_domain, cookie_path, cookie_host_only, cookie_http_only, cookie_key, cookie_value);
+    SetCookie(curl, cookie_domain, cookie_path, cookie_host_only, cookie_http_only, cookie_key, cookie_value);
   }
 
-  //print_cookies(curl);
+  //PrintCookies(curl);
 
   if (use_ajax) {
     struct curl_slist *http_headers = nullptr;
@@ -110,16 +106,16 @@ int main(int argc, char **argv) {
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, http_headers);
   }
 
+  post_fields = ReadPostFieldsConfig(config_obj);
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_fields);
 
   std::string filename_response_body;
   if (write_response_body_to_file) {
     // write response to file instead stdout
-    filename_response_body = url_to_filename(url);
+    filename_response_body = UrlToFilename(url);
     FILE *f = fopen(filename_response_body.c_str(), "wb");
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, f);
   }
-
   // perform request, write response
   res = curl_easy_perform(curl);
   if (res!=CURLE_OK) {
@@ -130,7 +126,7 @@ int main(int argc, char **argv) {
   char *content_type = nullptr;
   curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &content_type);
   if (write_response_body_to_file) {
-    add_file_extension_by_content_type(path_binary, filename_response_body, content_type);
+    AddFileExtensionByContentType(path_binary, filename_response_body, content_type);
   }
 
   curl_easy_cleanup(curl);

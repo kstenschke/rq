@@ -39,7 +39,6 @@ void ReadConfig(std::string &path_config,
                 const char *&user_agent,
                 bool &use_ajax,
                 bool &write_response_body_to_file,
-                const char *&post_fields,
                 json_object *&config_obj) {
   std::__1::string config_json = FileGetContents(path_config);
   config_obj = json_tokener_parse(config_json.c_str());
@@ -59,8 +58,21 @@ void ReadConfig(std::string &path_config,
   struct json_object *write_response_body_to_file_obj;
   json_object_object_get_ex(config_obj, "write_response_body_to_file", &write_response_body_to_file_obj);
   write_response_body_to_file = json_object_get_int(write_response_body_to_file_obj)==1;
+}
 
+void ReadCookiesConfig(const json_object *config_obj, const char *&cookie_domain, json_object *&cookie_items_obj) {
+  struct json_object *cookie_obj;
+  struct json_object *cookie_domain_obj;
+  json_object_object_get_ex(const_cast<json_object *>(config_obj), "cookie", &cookie_obj);
+  json_object_object_get_ex(cookie_obj, "domain", &cookie_domain_obj);
+  cookie_domain = json_object_get_string(cookie_domain_obj);
+  json_object_object_get_ex(cookie_obj, "values", &cookie_items_obj);
+}
+
+const char *ReadPostFieldsConfig(const json_object *config_obj) {
+  const char *post_fields;
   struct json_object *post_fields_obj;
-  json_object_object_get_ex(config_obj, "post_fields", &post_fields_obj);
+  json_object_object_get_ex(const_cast<json_object *>(config_obj), "post_fields", &post_fields_obj);
   post_fields = StrReplaceAll(json_object_get_string(post_fields_obj), "\", \"", "&").c_str();
+  return post_fields;
 }

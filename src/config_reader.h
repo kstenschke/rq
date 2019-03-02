@@ -38,7 +38,10 @@ void ReadConfig(std::string &path_config,
                 const char *&user_agent,
                 bool &use_ajax,
                 bool &write_response_body_to_file,
-                const char *&post_fields,
                 json_object *&config_obj);
+
+void ReadCookiesConfig(const json_object *config_obj, const char *&cookie_domain, json_object *&cookie_items_obj);
+
+const char *ReadPostFieldsConfig(const json_object *config_obj);
 
 #endif //RQ_CONFIG_READER_H

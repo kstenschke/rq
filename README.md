@@ -1,9 +1,7 @@
 rq
 ==
 
-Commandline wrapper for easier HTTP request / API testing with cURL, working on Linux and Mac OS.
-
-rq is implemented in C++ and depends only on lib-json.
+Commandline tool for HTTP API request testing with cURL, working on Linux and Mac OS.
 
 
 ## Usage

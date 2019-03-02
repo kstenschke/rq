@@ -33,7 +33,9 @@
 
 #include "helper_string.h"
 
-std::string StrReplaceAll(std::string &haystack, const char *needle, const char *replacement) {
+namespace helper {
+
+std::string String::StrReplaceAll(std::string &haystack, const char *needle, const char *replacement) {
   size_t needle_len = std::strlen(needle);
 
   size_t index = 0;
@@ -47,16 +49,16 @@ std::string StrReplaceAll(std::string &haystack, const char *needle, const char 
   return haystack;
 }
 
-std::string StrReplaceAll(const char *haystack, const char *needle, const char *replacement) {
+std::string String::StrReplaceAll(const char *haystack, const char *needle, const char *replacement) {
   std::string str = std::string(haystack);
   return StrReplaceAll(str, needle, replacement);
 }
 
-bool StrContains(char *haystack, const char *needle) {
+bool String::StrContains(char *haystack, const char *needle) {
   return std::string::npos != std::string(haystack, strlen(haystack)).find(needle);
 }
 
-std::string UrlToFilename(const char *url) {
+std::string String::UrlToFilename(const char *url) {
   std::string filename;
 
   filename = StrReplaceAll(url, "https://", "");
@@ -65,3 +67,5 @@ std::string UrlToFilename(const char *url) {
 
   return filename;
 }
+
+} // namespace helper

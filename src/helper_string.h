@@ -30,9 +30,15 @@
 #ifndef RQ_HELPER_STRING_H
 #define RQ_HELPER_STRING_H
 
+namespace helper {
+namespace String {
+
 std::string StrReplaceAll(std::string &haystack, const char *needle, const char *replacement);
 std::string StrReplaceAll(const char *haystack, const char *needle, const char *replacement);
 bool StrContains(char *haystack, const char *needle);
 std::string UrlToFilename(const char *url);
+
+} // namespace string
+} // namespace helper
 
 #endif //RQ_HELPER_STRING_H

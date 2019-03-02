@@ -30,6 +30,9 @@
 #ifndef RQ_HELPER_FILE_H
 #define RQ_HELPER_FILE_H
 
+namespace helper {
+namespace File {
+
 std::string GetBinaryPath(char **argv, size_t strLenExecutableName);
 bool FileExists(const std::string &name);
 std::string FileStreamGetContents(std::ifstream &file);
@@ -38,5 +41,7 @@ std::string FileGetContents(std::string &filename);
 void AddFileExtensionByContentType(std::string &path_binary,
                                    std::string &filename_response_body,
                                    char *content_type);
+} // namespace File
+} // namespace helper
 
 #endif //RQ_HELPER_FILE_H

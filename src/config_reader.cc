@@ -40,7 +40,7 @@ void ReadConfig(std::string &path_config,
                 bool &use_ajax,
                 bool &write_response_body_to_file,
                 json_object *&config_obj) {
-  std::__1::string config_json = FileGetContents(path_config);
+  std::__1::string config_json = helper::File::FileGetContents(path_config);
   config_obj = json_tokener_parse(config_json.c_str());
 
   struct json_object *url_obj;
@@ -73,6 +73,6 @@ const char *ReadPostFieldsConfig(const json_object *config_obj) {
   const char *post_fields;
   struct json_object *post_fields_obj;
   json_object_object_get_ex(const_cast<json_object *>(config_obj), "post_fields", &post_fields_obj);
-  post_fields = StrReplaceAll(json_object_get_string(post_fields_obj), "\", \"", "&").c_str();
+  post_fields = helper::String::StrReplaceAll(json_object_get_string(post_fields_obj), "\", \"", "&").c_str();
   return post_fields;
 }

@@ -43,11 +43,11 @@ const char *ReadPostFieldsConfig(const json_object *config_obj);
  * @param argv Array of arguments received, argv[0] is name and path of executable
  */
 int main(int argc, char **argv) {
-  std::string path_binary = GetBinaryPath(argv, 2);
+§  std::string path_binary = helper::File::GetBinaryPath(argv, 2);
   std::string path_config = path_binary;
   path_config = path_config.append("config.json");
 
-  if (!FileExists(path_config)) {
+  if (!helper::File::FileExists(path_config)) {
     fprintf(stderr, "File not found: config.json\n");
     return 1;
   }
@@ -112,7 +112,7 @@ int main(int argc, char **argv) {
   std::string filename_response_body;
   if (write_response_body_to_file) {
     // write response to file instead stdout
-    filename_response_body = UrlToFilename(url);
+    filename_response_body = helper::String::UrlToFilename(url);
     FILE *f = fopen(filename_response_body.c_str(), "wb");
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, f);
   }
@@ -126,7 +126,7 @@ int main(int argc, char **argv) {
   char *content_type = nullptr;
   curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &content_type);
   if (write_response_body_to_file) {
-    AddFileExtensionByContentType(path_binary, filename_response_body, content_type);
+    helper::File::AddFileExtensionByContentType(path_binary, filename_response_body, content_type);
   }
 
   curl_easy_cleanup(curl);

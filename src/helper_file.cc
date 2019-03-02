@@ -32,12 +32,16 @@
 #include <stdlib.h>
 #include <fstream>
 #include <vector>
+
+#include "helper_file.h"
 #include "helper_string.h"
+
+namespace helper {
 
 /**
  * Get absolute path to application executable
  */
-std::string GetBinaryPath(char **argv, size_t strLenExecutableName) {
+std::string File::GetBinaryPath(char **argv, size_t strLenExecutableName) {
   char *path_relative = argv[0];
   char absolute_path[255];
   char *ptr;
@@ -48,11 +52,11 @@ std::string GetBinaryPath(char **argv, size_t strLenExecutableName) {
   return std::string(ptr).substr(0, len_without_binary);
 }
 
-bool FileExists(const std::string &name) {
+bool File::FileExists(const std::string &name) {
   return access(name.c_str(), F_OK) != -1;
 }
 
-std::string FileStreamGetContents(std::ifstream &file) {
+std::string File::FileStreamGetContents(std::ifstream &file) {
   // Get filesize
   file.seekg(0, std::ios::end);
   std::streampos length = file.tellg();
@@ -67,15 +71,15 @@ std::string FileStreamGetContents(std::ifstream &file) {
   return str;
 }
 
-void AddFileExtensionByContentType(std::string &path_binary,
+void File::AddFileExtensionByContentType(std::string &path_binary,
                                    std::string &filename_response_body,
                                    char *content_type) {
   if (content_type) {
     std::string filename_old = path_binary.append(filename_response_body);
     std::string filename_new;
-    if (StrContains(content_type, "html")) {
+    if (helper::String::StrContains(content_type, "html")) {
       filename_new = path_binary.append(filename_response_body.append(".html"));
-    } else if (StrContains(content_type, "xml")) {
+    } else if (helper::String::StrContains(content_type, "xml")) {
       filename_new = path_binary.append(filename_response_body.append(".xml"));
     } else {
       filename_new = path_binary.append(filename_response_body.append(".json"));
@@ -84,8 +88,10 @@ void AddFileExtensionByContentType(std::string &path_binary,
   }
 }
 
-std::string FileGetContents(std::string &filename) {
+std::string File::FileGetContents(std::string &filename) {
   std::ifstream file(filename);
 
   return FileStreamGetContents(file);
 }
+
+} // namespace helper

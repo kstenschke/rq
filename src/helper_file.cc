@@ -48,6 +48,10 @@ std::string get_binary_path(char **argv, size_t strLenExecutableName) {
   return std::string(ptr).substr(0, len_without_binary);
 }
 
+bool file_exists(const std::string &name) {
+  return access(name.c_str(), F_OK) != -1;
+}
+
 std::string file_stream_get_contents(std::ifstream &file) {
   // Get filesize
   file.seekg(0, std::ios::end);

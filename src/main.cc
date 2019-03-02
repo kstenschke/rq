@@ -45,6 +45,11 @@ int main(int argc, char **argv) {
   std::string path_config = path_binary;
   path_config = path_config.append("config.json");
 
+  if (!file_exists(path_config)) {
+    fprintf(stderr, "File not found: config.json\n");
+    return 1;
+  }
+
   std::string config_json = file_get_contents(path_config);
 
   struct json_object *config_obj;
@@ -118,14 +123,14 @@ int main(int argc, char **argv) {
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, http_headers);
     http_headers = curl_slist_append(http_headers, "X-Requested-With: XMLHttpRequest");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, http_headers);
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_fields);
   }
+
+  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_fields);
 
   std::string filename_response_body;
   if (write_response_body_to_file) {
     // write response to file instead stdout
     filename_response_body = url_to_filename(url);
-    std::cout << "...........................> " << filename_response_body << "\n";
     FILE *f = fopen(filename_response_body.c_str(), "wb");
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, f);
   }

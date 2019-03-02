@@ -31,6 +31,7 @@
 #define RQ_HELPER_FILE_H
 
 std::string get_binary_path(char **argv, size_t strLenExecutableName);
+bool file_exists(const std::string &name);
 std::string file_stream_get_contents(std::ifstream &file);
 std::string file_get_contents(std::string &filename);
 

@@ -31,8 +31,8 @@
 #include <string>
 #include <json-c/json.h>
 
-#include "helper_string.h"
-#include "helper_file.h"
+#include "helper/helper_string.h"
+#include "helper/helper_file.h"
 
 void ReadConfig(std::string &path_config,
                 const char *&url,

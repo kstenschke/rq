@@ -32,9 +32,9 @@
 #include <json-c/json.h>
 #include <curl/curl.h>
 
-#include "helper_file.h"
+#include "helper/helper_file.h"
 #include "config_reader.h"
-#include "helper_string.h"
+#include "helper/helper_string.h"
 #include "curl_wrapper.h"
 
 const char *ReadPostFieldsConfig(const json_object *config_obj);
@@ -43,7 +43,7 @@ const char *ReadPostFieldsConfig(const json_object *config_obj);
  * @param argv Array of arguments received, argv[0] is name and path of executable
  */
 int main(int argc, char **argv) {
-§  std::string path_binary = helper::File::GetBinaryPath(argv, 2);
+  std::string path_binary = helper::File::GetBinaryPath(argv, 2);
   std::string path_config = path_binary;
   path_config = path_config.append("config.json");
 

@@ -6,8 +6,8 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../)
 
 add_executable(rq
-        src/helper_file.cc
-        src/helper_string.cc
+        src/helper/helper_file.cc
+        src/helper/helper_string.cc
         src/config_reader.cc
         src/curl_wrapper.cc
         src/main.cc)

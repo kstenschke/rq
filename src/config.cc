@@ -41,16 +41,14 @@ Config::Config(std::string &path_config) {
   std::string config_json = helper::File::FileGetContents(path_config);
   config_obj = json_tokener_parse(config_json.c_str());
 
-  ResolveBaseConfig();
-  ResolveCookiesConfig();
+  ResolveSettings();
+  ResolveUrls();
+  ResolveCookies();
+  ResolvePostFields();
 }
 
 // resolve basic config from JSON: url, user_agent, us_ajax, write_response_body_to_file
-void Config::ResolveBaseConfig() {
-  struct json_object *url_obj;
-  json_object_object_get_ex(config_obj, "url", &url_obj);
-  url = json_object_get_string(url_obj);
-
+void Config::ResolveSettings() {
   struct json_object *user_agent_obj;
   json_object_object_get_ex(config_obj, "user_agent", &user_agent_obj);
   user_agent = json_object_get_string(user_agent_obj);
@@ -64,7 +62,12 @@ void Config::ResolveBaseConfig() {
   write_response_body_to_file = json_object_get_int(write_response_body_to_file_obj)==1;
 }
 
-void Config::ResolveCookiesConfig() {
+void Config::ResolveUrls() {
+  json_object_object_get_ex(config_obj, "urls", &urls_obj);
+  amount_urls = json_object_array_length(urls_obj);
+}
+
+void Config::ResolveCookies() {
   struct json_object *cookie_obj;
   struct json_object *cookie_domain_obj;
   json_object_object_get_ex(config_obj, "cookie", &cookie_obj);
@@ -73,11 +76,11 @@ void Config::ResolveCookiesConfig() {
   json_object_object_get_ex(cookie_obj, "values", &cookie_items_obj);
 }
 
-std::string Config::GetPostFieldsConfig() {
+void Config::ResolvePostFields() {
   struct json_object *post_fields_obj;
   json_object_object_get_ex(config_obj, "post_fields", &post_fields_obj);
 
-  return helper::String::StrReplaceAll(json_object_get_string(post_fields_obj), "\", \"", "&");
+  post_fields = helper::String::StrReplaceAll(json_object_get_string(post_fields_obj), "\", \"", "&");
 }
 
 } // namespace rq

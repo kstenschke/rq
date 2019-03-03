@@ -36,7 +36,8 @@ namespace String {
 std::string StrReplaceAll(std::string &haystack, const char *needle, const char *replacement);
 std::string StrReplaceAll(const char *haystack, const char *needle, const char *replacement);
 bool StrContains(char *haystack, const char *needle);
-std::string UrlToFilename(const char *url);
+int GetAmountDigits(int number);
+std::string UrlToFilename(const char *url, int ordinal_prefix, int amount_prefix_digits);
 
 } // namespace string
 } // namespace helper

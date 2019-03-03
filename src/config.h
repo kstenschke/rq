@@ -36,26 +36,28 @@
 namespace rq {
 class Config {
  public:
-  const char *url;
   const char *user_agent;
   bool use_ajax;
   bool write_response_body_to_file;
+  std::string post_fields;
 
   const char *cookie_domain;
   json_object *cookie_items_obj;
 
+  int amount_urls;
+  struct json_object *urls_obj;
+
   // Constructor
   Config(std::string &path_config);
-
-  std::string GetPostFieldsConfig();
 
  private:
   json_object *config_obj;
 
   // resolve basic config from JSON: url, user_agent, us_ajax, write_response_body_to_file
-  void ResolveBaseConfig();
-
-  void ResolveCookiesConfig();
+  void ResolveSettings();
+  void ResolveUrls();
+  void ResolveCookies();
+  void ResolvePostFields();
 
 };
 

@@ -99,50 +99,55 @@ int main(int argc, char **argv) {
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, http_headers);
   }
 
-  // TODO make url an array in config.json, iterate over values than
-  curl_easy_setopt(curl, CURLOPT_URL, Config->url);
+  int amount_prefix_digits = helper::String::GetAmountDigits(Config->amount_urls);
+  for (int i=0; i<Config->amount_urls; i++) {
+    std::string url = json_object_get_string(json_object_array_get_idx(Config->urls_obj, i));
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 
-  // set post fields
-  std::string post_fields = Config->GetPostFieldsConfig();
-  // TODO check and allow empty post fields config = no post data than
-  // TODO implement post field types with generic data values
-  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_fields.c_str());
+    // set post fields
+    // TODO implement post field types with generic data values
+    std::string post_fields = Config->post_fields;
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_fields.c_str());
 
-  std::string filename_response_body;
-  std::string path_file_response_body;
-  if (Config->write_response_body_to_file) {
-    // write response to file instead stdout
-    const char *pathOutDirectory = "results";
-    if (!helper::File::DirectoryExists(pathOutDirectory)) {
-      if (-1 == mkdir(pathOutDirectory, 0777)) {
-        fprintf(stderr, "Failed to create results directory\n");
-        return 1;
+    std::string filename_response_body;
+    std::string path_file_response_body;
+    if (Config->write_response_body_to_file) {
+      // write response to file instead stdout
+      const char *pathOutDirectory = "results";
+      if (!helper::File::DirectoryExists(pathOutDirectory)) {
+        if (-1==mkdir(pathOutDirectory, 0777)) {
+          fprintf(stderr, "Failed to create results directory\n");
+          return 1;
+        }
       }
+
+      filename_response_body = helper::String::UrlToFilename(url.c_str(), i+1, amount_prefix_digits);
+      path_file_response_body = pathOutDirectory;
+      path_file_response_body = path_file_response_body.append("/").append(filename_response_body);
+
+      FILE *file_handle = fopen(path_file_response_body.c_str(), "wb");
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, file_handle);
     }
 
-    filename_response_body = helper::String::UrlToFilename(Config->url);
-    path_file_response_body = pathOutDirectory;
-    path_file_response_body = path_file_response_body.append("/").append(filename_response_body);
+    // perform request, write response body (to stdout or file)
+    res = curl_easy_perform(curl);
+    if (res!=CURLE_OK) {
+      fprintf(stderr, "Curl perform failed: %s\n", curl_easy_strerror(res));
+      return 1;
+    }
 
-    FILE *f = fopen(path_file_response_body.c_str(), "wb");
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, f);
+    char *content_type = nullptr;
+    curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &content_type);
+    if (Config->write_response_body_to_file) {
+      // change ending of result file, to type detected from response body
+      helper::File::AddFileExtensionByContentType(path_file_response_body, content_type);
+    }
   }
 
-  // perform request, write response body (to stdout or file)
-  res = curl_easy_perform(curl);
-  if (res!=CURLE_OK) {
-    fprintf(stderr, "Curl perform failed: %s\n", curl_easy_strerror(res));
-    return 1;
-  }
-
-  char *content_type = nullptr;
-  curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &content_type);
-  if (Config->write_response_body_to_file) {
-    // change ending of result file, to type detected from response body
-    helper::File::AddFileExtensionByContentType(path_file_response_body, content_type);
-  }
-
+  // clean up
+  delete Config;
   curl_easy_cleanup(curl);
   curl_global_cleanup();
+
   return 0;
 }

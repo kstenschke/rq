@@ -58,14 +58,26 @@ bool String::StrContains(char *haystack, const char *needle) {
   return std::string::npos != std::string(haystack, strlen(haystack)).find(needle);
 }
 
-std::string String::UrlToFilename(const char *url) {
+int String::GetAmountDigits(int number) {
+  std::string str = std::to_string(number);
+
+  return static_cast<int>(str.length());
+}
+
+std::string String::UrlToFilename(const char *url, int ordinal_prefix, int amount_prefix_digits) {
   std::string filename;
 
   filename = StrReplaceAll(url, "https://", "");
   filename = StrReplaceAll(filename, "http://", "");
   filename = StrReplaceAll(filename, "/", "-");
 
-  return filename;
+  std::string prefix = std::to_string(ordinal_prefix);
+  while (prefix.length() < amount_prefix_digits) {
+    std::string zero = "0";
+    prefix = zero.append(prefix);
+  }
+
+  return prefix.append("-").append(filename);
 }
 
 } // namespace helper

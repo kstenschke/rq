@@ -33,15 +33,22 @@
 #include <json-c/json_object.h>
 #include <string>
 
-void ReadConfig(std::string &path_config,
-                const char *&url,
-                const char *&user_agent,
-                bool &use_ajax,
-                bool &write_response_body_to_file,
-                json_object *&config_obj);
+namespace rq {
+class ConfigReader {
+ public:
+  static void ReadConfig(std::string &path_config,
+                         const char *&url,
+                         const char *&user_agent,
+                         bool &use_ajax,
+                         bool &write_response_body_to_file,
+                         json_object *&config_obj);
 
-void ReadCookiesConfig(const json_object *config_obj, const char *&cookie_domain, json_object *&cookie_items_obj);
+  static void ReadCookiesConfig(const json_object *config_obj, const char *&cookie_domain, json_object *&cookie_items_obj);
 
-const char *ReadPostFieldsConfig(const json_object *config_obj);
+  static std::string ReadPostFieldsConfig(const json_object *config_obj);
+
+};
+
+} // namespace rq
 
 #endif //RQ_CONFIG_READER_H

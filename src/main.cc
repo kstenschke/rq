@@ -37,7 +37,6 @@
 #include "helper/helper_string.h"
 #include "curl_wrapper.h"
 
-const char *ReadPostFieldsConfig(const json_object *config_obj);
 /**
  * @param argc Amount of arguments received
  * @param argv Array of arguments received, argv[0] is name and path of executable
@@ -56,11 +55,10 @@ int main(int argc, char **argv) {
   const char *user_agent;
   bool use_ajax;
   bool write_response_body_to_file;
-  const char *post_fields;
 
   json_object *config_obj;
 
-  ReadConfig(path_config, url, user_agent, use_ajax, write_response_body_to_file, config_obj);
+  rq::ConfigReader::ReadConfig(path_config, url, user_agent, use_ajax, write_response_body_to_file, config_obj);
 
   CURL *curl;
   CURLcode res;
@@ -82,7 +80,7 @@ int main(int argc, char **argv) {
   const char *cookie_domain;
   struct json_object *cookie_items_obj;
 
-  ReadCookiesConfig(config_obj, cookie_domain, cookie_items_obj);
+  rq::ConfigReader::ReadCookiesConfig(config_obj, cookie_domain, cookie_items_obj);
 
   for (int i=0; i < json_object_array_length(cookie_items_obj); i++) {
     struct json_object *cookie_value_obj = json_object_array_get_idx(cookie_items_obj, i);
@@ -106,8 +104,8 @@ int main(int argc, char **argv) {
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, http_headers);
   }
 
-  post_fields = ReadPostFieldsConfig(config_obj);
-  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_fields);
+  std::string post_fields = rq::ConfigReader::ReadPostFieldsConfig(config_obj);
+  curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_fields.c_str());
 
   std::string filename_response_body;
   if (write_response_body_to_file) {

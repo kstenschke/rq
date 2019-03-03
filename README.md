@@ -1,3 +1,5 @@
+[![Build Status GCC](https://travis-ci.org/kstenschke/rq.svg?branch=master)](https://travis-ci.org/kstenschke/rq)
+
 rq
 ==
 

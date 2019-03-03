@@ -1,7 +1,7 @@
 rq
 ==
 
-Commandline tool for HTTP API request testing with cURL, working on Linux and Mac OS.
+Commandline tool for batch testing of HTTP API requests, working on Linux and Mac OS.
 
 
 ## Usage

@@ -34,18 +34,28 @@
 #include <string>
 
 namespace rq {
-class ConfigReader {
+class Config {
  public:
-  static void ReadConfig(std::string &path_config,
-                         const char *&url,
-                         const char *&user_agent,
-                         bool &use_ajax,
-                         bool &write_response_body_to_file,
-                         json_object *&config_obj);
+  const char *url;
+  const char *user_agent;
+  bool use_ajax;
+  bool write_response_body_to_file;
 
-  static void ReadCookiesConfig(const json_object *config_obj, const char *&cookie_domain, json_object *&cookie_items_obj);
+  const char *cookie_domain;
+  json_object *cookie_items_obj;
 
-  static std::string ReadPostFieldsConfig(const json_object *config_obj);
+  // Constructor
+  Config(std::string &path_config);
+
+  std::string GetPostFieldsConfig();
+
+ private:
+  json_object *config_obj;
+
+  // resolve basic config from JSON: url, user_agent, us_ajax, write_response_body_to_file
+  void ResolveBaseConfig();
+
+  void ResolveCookiesConfig();
 
 };
 

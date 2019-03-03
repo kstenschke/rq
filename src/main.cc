@@ -33,7 +33,7 @@
 #include <curl/curl.h>
 
 #include "helper/helper_file.h"
-#include "config_reader.h"
+#include "config.h"
 #include "helper/helper_string.h"
 #include "curl_wrapper.h"
 
@@ -50,15 +50,7 @@ int main(int argc, char **argv) {
     fprintf(stderr, "File not found: config.json\n");
     return 1;
   }
-
-  const char *url;
-  const char *user_agent;
-  bool use_ajax;
-  bool write_response_body_to_file;
-
-  json_object *config_obj;
-
-  rq::ConfigReader::ReadConfig(path_config, url, user_agent, use_ajax, write_response_body_to_file, config_obj);
+  auto *Config = new rq::Config(path_config);
 
   CURL *curl;
   CURLcode res;
@@ -70,20 +62,15 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  curl_easy_setopt(curl, CURLOPT_USERAGENT, user_agent);
-  curl_easy_setopt(curl, CURLOPT_URL, url);
+  curl_easy_setopt(curl, CURLOPT_USERAGENT, Config->user_agent);
+  curl_easy_setopt(curl, CURLOPT_URL, Config->url);
   curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
-  // set cookies
+  // unset cookies
   curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "");
-
-  const char *cookie_domain;
-  struct json_object *cookie_items_obj;
-
-  rq::ConfigReader::ReadCookiesConfig(config_obj, cookie_domain, cookie_items_obj);
-
-  for (int i=0; i < json_object_array_length(cookie_items_obj); i++) {
-    struct json_object *cookie_value_obj = json_object_array_get_idx(cookie_items_obj, i);
+  // set cookies from config.json
+  for (int i=0; i < json_object_array_length(Config->cookie_items_obj); i++) {
+    struct json_object *cookie_value_obj = json_object_array_get_idx(Config->cookie_items_obj, i);
 
     const char *cookie_key = json_object_get_string(json_object_array_get_idx(cookie_value_obj, 0));
     const char *cookie_value = json_object_get_string(json_object_array_get_idx(cookie_value_obj, 1));
@@ -91,12 +78,12 @@ int main(int argc, char **argv) {
     bool cookie_http_only = json_object_get_int(json_object_array_get_idx(cookie_value_obj, 3)) == 1;
     const char *cookie_path = json_object_get_string(json_object_array_get_idx(cookie_value_obj, 4));
 
-    SetCookie(curl, cookie_domain, cookie_path, cookie_host_only, cookie_http_only, cookie_key, cookie_value);
+    SetCookie(curl, Config->cookie_domain, cookie_path, cookie_host_only, cookie_http_only, cookie_key, cookie_value);
   }
 
   //PrintCookies(curl);
 
-  if (use_ajax) {
+  if (Config->use_ajax) {
     struct curl_slist *http_headers = nullptr;
     http_headers = curl_slist_append(http_headers, "Content-Type: application/x-www-form-urlencoded; charset=UTF-8");
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, http_headers);
@@ -104,16 +91,18 @@ int main(int argc, char **argv) {
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, http_headers);
   }
 
-  std::string post_fields = rq::ConfigReader::ReadPostFieldsConfig(config_obj);
+  std::string post_fields = Config->GetPostFieldsConfig();
+  // TODO check and allow empty post fields config = no post data than
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_fields.c_str());
 
   std::string filename_response_body;
-  if (write_response_body_to_file) {
+  if (Config->write_response_body_to_file) {
     // write response to file instead stdout
-    filename_response_body = helper::String::UrlToFilename(url);
+    filename_response_body = helper::String::UrlToFilename(Config->url);
     FILE *f = fopen(filename_response_body.c_str(), "wb");
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, f);
   }
+
   // perform request, write response
   res = curl_easy_perform(curl);
   if (res!=CURLE_OK) {
@@ -123,7 +112,7 @@ int main(int argc, char **argv) {
 
   char *content_type = nullptr;
   curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &content_type);
-  if (write_response_body_to_file) {
+  if (Config->write_response_body_to_file) {
     helper::File::AddFileExtensionByContentType(path_binary, filename_response_body, content_type);
   }
 

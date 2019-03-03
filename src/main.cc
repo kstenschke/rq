@@ -35,7 +35,7 @@
 #include "helper/helper_file.h"
 #include "config.h"
 #include "helper/helper_string.h"
-#include "curl_wrapper.h"
+#include "helper/helper_curl.h"
 
 /**
  * @param argc Amount of arguments received
@@ -44,14 +44,16 @@
 int main(int argc, char **argv) {
   std::string path_binary = helper::File::GetBinaryPath(argv, 2);
   std::string path_config = path_binary;
-  path_config = path_config.append("config.json");
 
+  // get parameters from config.json
+  path_config = path_config.append("config.json");
   if (!helper::File::FileExists(path_config)) {
     fprintf(stderr, "File not found: config.json\n");
     return 1;
   }
   auto *Config = new rq::Config(path_config);
 
+  // init cURL
   CURL *curl;
   CURLcode res;
 
@@ -63,25 +65,30 @@ int main(int argc, char **argv) {
   }
 
   curl_easy_setopt(curl, CURLOPT_USERAGENT, Config->user_agent);
-  curl_easy_setopt(curl, CURLOPT_URL, Config->url);
   curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
   // unset cookies
   curl_easy_setopt(curl, CURLOPT_COOKIEFILE, "");
-  // set cookies from config.json
-  for (int i=0; i < json_object_array_length(Config->cookie_items_obj); i++) {
+  // set cookies as in config.json
+  for (int i = 0; i < json_object_array_length(Config->cookie_items_obj); i++) {
     struct json_object *cookie_value_obj = json_object_array_get_idx(Config->cookie_items_obj, i);
 
     const char *cookie_key = json_object_get_string(json_object_array_get_idx(cookie_value_obj, 0));
     const char *cookie_value = json_object_get_string(json_object_array_get_idx(cookie_value_obj, 1));
-    bool cookie_host_only = json_object_get_int(json_object_array_get_idx(cookie_value_obj, 2)) == 1;
-    bool cookie_http_only = json_object_get_int(json_object_array_get_idx(cookie_value_obj, 3)) == 1;
+    bool cookie_host_only = json_object_get_int(json_object_array_get_idx(cookie_value_obj, 2))==1;
+    bool cookie_http_only = json_object_get_int(json_object_array_get_idx(cookie_value_obj, 3))==1;
     const char *cookie_path = json_object_get_string(json_object_array_get_idx(cookie_value_obj, 4));
 
-    SetCookie(curl, Config->cookie_domain, cookie_path, cookie_host_only, cookie_http_only, cookie_key, cookie_value);
+    helper::Curl::SetCookie(curl,
+                            Config->cookie_domain,
+                            cookie_path,
+                            cookie_host_only,
+                            cookie_http_only,
+                            cookie_key,
+                            cookie_value);
   }
 
-  //PrintCookies(curl);
+  // helper::Curl::PrintCookies(curl);
 
   if (Config->use_ajax) {
     struct curl_slist *http_headers = nullptr;
@@ -91,10 +98,17 @@ int main(int argc, char **argv) {
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, http_headers);
   }
 
+  // TODO allow override url from config.json by url-option as cli argument
+  // TODO allow override url from config.json by iteration over values from urls.csv
+  curl_easy_setopt(curl, CURLOPT_URL, Config->url);
+
+  // set post fields
   std::string post_fields = Config->GetPostFieldsConfig();
   // TODO check and allow empty post fields config = no post data than
+  // TODO implement post field types with generic data values
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_fields.c_str());
 
+  // TODO create directory "results" if not there yet. use in result file path
   std::string filename_response_body;
   if (Config->write_response_body_to_file) {
     // write response to file instead stdout
@@ -103,7 +117,7 @@ int main(int argc, char **argv) {
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, f);
   }
 
-  // perform request, write response
+  // perform request, write response body (to stdout or file)
   res = curl_easy_perform(curl);
   if (res!=CURLE_OK) {
     fprintf(stderr, "Curl perform failed: %s\n", curl_easy_strerror(res));
@@ -113,6 +127,7 @@ int main(int argc, char **argv) {
   char *content_type = nullptr;
   curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &content_type);
   if (Config->write_response_body_to_file) {
+    // change ending of result file, to type detected from response body
     helper::File::AddFileExtensionByContentType(path_binary, filename_response_body, content_type);
   }
 

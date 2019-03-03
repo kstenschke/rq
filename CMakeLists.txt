@@ -9,7 +9,7 @@ add_executable(rq
         src/helper/helper_file.cc
         src/helper/helper_string.cc
         src/config.cc
-        src/curl_wrapper.cc
+        src/helper/helper_curl.cc
         src/main.cc)
 
 find_package(PkgConfig)

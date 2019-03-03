@@ -32,6 +32,9 @@
 
 #include <curl/curl.h>
 
+namespace helper {
+namespace Curl {
+
 void PrintCookies(CURL *curl);
 
 void SetCookie(CURL *curl_handle,
@@ -41,5 +44,8 @@ void SetCookie(CURL *curl_handle,
                bool http_only,
                const char *cookie_key,
                const char *cookie_value);
+
+} // namespace Curl
+} // namespace helper
 
 #endif //RQ_CURL_WRAPPER_H

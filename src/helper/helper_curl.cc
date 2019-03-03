@@ -30,14 +30,15 @@
 #include <curl/curl.h>
 #include <cstdlib>
 
-#include "curl_wrapper.h"
+#include "helper_curl.h"
 
 #ifdef WIN32
 #define snprintf _snprintf
 #endif
 
-void PrintCookies(CURL *curl)
-{
+namespace helper {
+
+void Curl::PrintCookies(CURL *curl) {
   CURLcode res;
   struct curl_slist *cookies;
   struct curl_slist *nc;
@@ -45,31 +46,31 @@ void PrintCookies(CURL *curl)
 
   printf("Cookies, curl knows:\n");
   res = curl_easy_getinfo(curl, CURLINFO_COOKIELIST, &cookies);
-  if(res != CURLE_OK) {
+  if (res!=CURLE_OK) {
     fprintf(stderr, "Curl curl_easy_getinfo failed: %s\n",
             curl_easy_strerror(res));
     exit(1);
   }
   nc = cookies;
   i = 1;
-  while(nc) {
+  while (nc) {
     printf("[%d]: %s\n", i, nc->data);
     nc = nc->next;
     i++;
   }
-  if(i == 1) {
+  if (i==1) {
     printf("(none)\n");
   }
   curl_slist_free_all(cookies);
 }
 
-void SetCookie(CURL *curl_handle,
-               const char *cookie_url,
-               const char *cookie_path,
-               bool host_only,
-               bool http_only,
-               const char *cookie_key,
-               const char *cookie_value) {
+void Curl::SetCookie(CURL *curl_handle,
+                     const char *cookie_url,
+                     const char *cookie_path,
+                     bool host_only,
+                     bool http_only,
+                     const char *cookie_key,
+                     const char *cookie_value) {
   // Netscape format cookie
   char nline[256];
   snprintf(
@@ -84,11 +85,12 @@ void SetCookie(CURL *curl_handle,
   CURLcode res = curl_easy_setopt(curl_handle, CURLOPT_COOKIELIST, nline);
 
   if (res!=CURLE_OK) {
-    fprintf(stderr, "Curl curl_easy_setopt failed: %s\n",
-            curl_easy_strerror(res));
+    fprintf(stderr, "Curl curl_easy_setopt failed: %s\n", curl_easy_strerror(res));
 //return 1;
   }
 
   //printf("Erasing curl's knowledge of cookies!\n");
   //curl_easy_setopt(curl, CURLOPT_COOKIELIST, "ALL");
 }
+
+} // namespace helper

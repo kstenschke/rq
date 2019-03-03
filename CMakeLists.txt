@@ -8,7 +8,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../)
 add_executable(rq
         src/helper/helper_file.cc
         src/helper/helper_string.cc
-        src/config.cc
+        src/config_json_parser.cc
         src/helper/helper_curl.cc
         src/main.cc)
 

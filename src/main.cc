@@ -34,7 +34,7 @@
 #include <sys/stat.h>
 
 #include "helper/helper_file.h"
-#include "config.h"
+#include "config_json_parser.h"
 #include "helper/helper_string.h"
 #include "helper/helper_curl.h"
 
@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
     fprintf(stderr, "File not found: config.json\n");
     return 1;
   }
-  auto *Config = new rq::Config(path_config);
+  auto *Config = new rq::ConfigJsonParser(path_config);
 
   // init cURL
   CURL *curl;

@@ -31,13 +31,13 @@
 #include <string>
 #include <json-c/json.h>
 
-#include "config.h"
+#include "config_json_parser.h"
 #include "helper/helper_string.h"
 #include "helper/helper_file.h"
 
 namespace rq {
 // Constructor
-Config::Config(std::string &path_config) {
+ConfigJsonParser::ConfigJsonParser(std::string &path_config) {
   std::string config_json = helper::File::FileGetContents(path_config);
   config_obj = json_tokener_parse(config_json.c_str());
 
@@ -48,7 +48,7 @@ Config::Config(std::string &path_config) {
 }
 
 // resolve basic config from JSON: url, user_agent, us_ajax, write_response_body_to_file
-void Config::ResolveSettings() {
+void ConfigJsonParser::ResolveSettings() {
   struct json_object *user_agent_obj;
   json_object_object_get_ex(config_obj, "user_agent", &user_agent_obj);
   user_agent = json_object_get_string(user_agent_obj);
@@ -62,12 +62,12 @@ void Config::ResolveSettings() {
   write_response_body_to_file = json_object_get_int(write_response_body_to_file_obj)==1;
 }
 
-void Config::ResolveUrls() {
+void ConfigJsonParser::ResolveUrls() {
   json_object_object_get_ex(config_obj, "urls", &urls_obj);
   amount_urls = json_object_array_length(urls_obj);
 }
 
-void Config::ResolveCookies() {
+void ConfigJsonParser::ResolveCookies() {
   struct json_object *cookie_obj;
   struct json_object *cookie_domain_obj;
   json_object_object_get_ex(config_obj, "cookie", &cookie_obj);
@@ -76,7 +76,7 @@ void Config::ResolveCookies() {
   json_object_object_get_ex(cookie_obj, "values", &cookie_items_obj);
 }
 
-void Config::ResolvePostFields() {
+void ConfigJsonParser::ResolvePostFields() {
   struct json_object *post_fields_obj;
   json_object_object_get_ex(config_obj, "post_fields", &post_fields_obj);
 

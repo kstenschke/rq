@@ -34,7 +34,7 @@
 #include <string>
 
 namespace rq {
-class Config {
+class ConfigJsonParser {
  public:
   const char *user_agent;
   bool use_ajax;
@@ -48,7 +48,7 @@ class Config {
   struct json_object *urls_obj;
 
   // Constructor
-  Config(std::string &path_config);
+  ConfigJsonParser(std::string &path_config);
 
  private:
   json_object *config_obj;

@@ -115,7 +115,10 @@ int main(int argc, char **argv) {
     // write response to file instead stdout
     const char *pathOutDirectory = "results";
     if (!helper::File::DirectoryExists(pathOutDirectory)) {
-      mkdir(pathOutDirectory, 0777);
+      if (-1 == mkdir(pathOutDirectory, 0777)) {
+        fprintf(stderr, "Failed to create results directory\n");
+        return 1;
+      }
     }
 
     filename_response_body = helper::String::UrlToFilename(Config->url);

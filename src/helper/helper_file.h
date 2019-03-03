@@ -35,11 +35,11 @@ namespace File {
 
 std::string GetBinaryPath(char **argv, size_t strLenExecutableName);
 bool FileExists(const std::string &name);
+bool DirectoryExists(const char *pathDirectory);
 std::string FileStreamGetContents(std::ifstream &file);
 std::string FileGetContents(std::string &filename);
 
-void AddFileExtensionByContentType(std::string &path_binary,
-                                   std::string &filename_response_body,
+void AddFileExtensionByContentType(std::string &path_file_response_body,
                                    char *content_type);
 } // namespace File
 } // namespace helper

@@ -31,7 +31,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <fstream>
+#include <dirent.h>
+#include <errno.h>
 #include <vector>
+#include <iostream>
 
 #include "helper_file.h"
 #include "helper_string.h"
@@ -56,6 +59,18 @@ bool File::FileExists(const std::string &name) {
   return access(name.c_str(), F_OK) != -1;
 }
 
+bool File::DirectoryExists(const char *pathDirectory) {
+  DIR* dir = opendir(pathDirectory);
+  if (dir) {
+    closedir(dir);
+    return true;
+  }
+
+  if (ENOENT != errno) std::cout << "opendir() " << pathDirectory << " failed";
+
+  return false;
+}
+
 std::string File::FileStreamGetContents(std::ifstream &file) {
   // Get filesize
   file.seekg(0, std::ios::end);
@@ -71,20 +86,18 @@ std::string File::FileStreamGetContents(std::ifstream &file) {
   return str;
 }
 
-void File::AddFileExtensionByContentType(std::string &path_binary,
-                                   std::string &filename_response_body,
-                                   char *content_type) {
+void File::AddFileExtensionByContentType(std::string &path_file_response_body, char *content_type) {
   if (content_type) {
-    std::string filename_old = path_binary.append(filename_response_body);
-    std::string filename_new;
+    std::string filename_new = path_file_response_body;
     if (helper::String::StrContains(content_type, "html")) {
-      filename_new = path_binary.append(filename_response_body.append(".html"));
+      filename_new = filename_new.append(".html");
     } else if (helper::String::StrContains(content_type, "xml")) {
-      filename_new = path_binary.append(filename_response_body.append(".xml"));
+      filename_new = filename_new.append(".xml");
     } else {
-      filename_new = path_binary.append(filename_response_body.append(".json"));
+      filename_new = filename_new.append(".json");
     }
-    rename(filename_old.c_str(), filename_new.c_str());
+
+    rename(path_file_response_body.c_str(), filename_new.c_str());
   }
 }
 

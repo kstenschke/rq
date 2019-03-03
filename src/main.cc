@@ -31,6 +31,7 @@
 #include <fstream>
 #include <json-c/json.h>
 #include <curl/curl.h>
+#include <sys/stat.h>
 
 #include "helper/helper_file.h"
 #include "config.h"
@@ -108,12 +109,20 @@ int main(int argc, char **argv) {
   // TODO implement post field types with generic data values
   curl_easy_setopt(curl, CURLOPT_POSTFIELDS, post_fields.c_str());
 
-  // TODO create directory "results" if not there yet. use in result file path
   std::string filename_response_body;
+  std::string path_file_response_body;
   if (Config->write_response_body_to_file) {
     // write response to file instead stdout
+    const char *pathOutDirectory = "results";
+    if (!helper::File::DirectoryExists(pathOutDirectory)) {
+      mkdir(pathOutDirectory, 0777);
+    }
+
     filename_response_body = helper::String::UrlToFilename(Config->url);
-    FILE *f = fopen(filename_response_body.c_str(), "wb");
+    path_file_response_body = pathOutDirectory;
+    path_file_response_body = path_file_response_body.append("/").append(filename_response_body);
+
+    FILE *f = fopen(path_file_response_body.c_str(), "wb");
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, f);
   }
 
@@ -128,7 +137,7 @@ int main(int argc, char **argv) {
   curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &content_type);
   if (Config->write_response_body_to_file) {
     // change ending of result file, to type detected from response body
-    helper::File::AddFileExtensionByContentType(path_binary, filename_response_body, content_type);
+    helper::File::AddFileExtensionByContentType(path_file_response_body, content_type);
   }
 
   curl_easy_cleanup(curl);

@@ -99,8 +99,7 @@ int main(int argc, char **argv) {
     curl_easy_setopt(curl, CURLOPT_HTTPHEADER, http_headers);
   }
 
-  // TODO allow override url from config.json by url-option as cli argument
-  // TODO allow override url from config.json by iteration over values from urls.csv
+  // TODO make url an array in config.json, iterate over values than
   curl_easy_setopt(curl, CURLOPT_URL, Config->url);
 
   // set post fields

@@ -1,4 +1,4 @@
-h1. rq - Changelog
+rq - Changelog
+==============
 
-* 0.1
-    ** Initial release
+* 0.1 Initial release

@@ -1,4 +1,5 @@
 .idea
+src/config.h
 config.json
 cmake-build-debug
 results

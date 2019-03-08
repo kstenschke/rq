@@ -33,6 +33,7 @@
 #include <curl/curl.h>
 #include <sys/stat.h>
 
+#include "config.h"
 #include "helper/helper_file.h"
 #include "config_json_parser.h"
 #include "helper/helper_string.h"
@@ -43,6 +44,12 @@
  * @param argv Array of arguments received, argv[0] is name and path of executable
  */
 int main(int argc, char **argv) {
+  if (argc == 2 && (strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0)) {
+    std::cout << "rq version " << Rq_VERSION_MAJOR << "." << Rq_VERSION_MINOR << "\n"
+                 "Copyright (c) 2019 Kay Stenschke\n\n";
+    return 0;
+  }
+
   std::string path_binary = helper::File::GetBinaryPath(argv, 2);
   std::string path_config = path_binary;
 
